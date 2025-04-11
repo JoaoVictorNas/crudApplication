@@ -1,24 +1,49 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { PersonagemService } from './personagem.service';
 import { CriarPersonagemDto } from './dto/criar-personagem.dto';
-import { Personagem } from './interfaces/personagem.interface';
+import { AtualizarNomeAventureiroDto } from './dto/atualizar-nome-aventureiro.dto';
 
-@Controller('Personagem')
+@Controller('personagem')
 export class PersonagemController {
   constructor(private readonly personagemService: PersonagemService) {}
 
   @Post()
-  criarPersonagem(@Body() dto: CriarPersonagemDto): Personagem {
+  criar(@Body() dto: CriarPersonagemDto) {
     return this.personagemService.create(dto);
   }
 
   @Get()
-  listarPersonagem(): Personagem[] {
+  listar() {
     return this.personagemService.findAll();
   }
 
   @Get(':id')
-  pegarPersonagem(@Param('id') id: string): Personagem {
+  buscarPorId(@Param('id') id: string) {
     return this.personagemService.findOne(Number(id));
+  }
+
+  @Patch(':id/nome-aventureiro')
+  atualizarNome(@Param('id') id: string, @Body() dto: AtualizarNomeAventureiroDto) {
+    return this.personagemService.updateNomeAventureiro(Number(id), dto.nomeAventureiro);
+  }
+
+  @Delete(':id')
+  remover(@Param('id') id: string) {
+    return this.personagemService.remove(Number(id));
+  }
+
+  @Get(':id/itens')
+  listarItens(@Param('id') id: string) {
+    return this.personagemService.listarItens(Number(id));
+  }
+
+  @Get(':id/amuleto')
+  buscarAmuleto(@Param('id') id: string) {
+    return this.personagemService.buscarAmuleto(Number(id));
+  }
+
+  @Delete(':id/itens/:nome')
+  removerItem(@Param('id') id: string, @Param('nome') nome: string) {
+    return this.personagemService.removerItem(Number(id), nome);
   }
 }

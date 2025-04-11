@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { CriarPersonagemDto } from './dto/criar-personagem.dto';
-import { Item, Personagem } from './interfaces/personagem.interface';
-import { PersonagemClasse } from 'src/common/enums/classe.enum';
+import { Personagem } from './interfaces/personagem.interface';
+import { PersonagemClasse } from '../common/enums/classe.enum';
+import { ItemMagico } from '../item-magico/interfaces/item-magico.interfaces';
 
 @Injectable()
 export class PersonagemService {
@@ -54,18 +55,62 @@ export class PersonagemService {
     };
   }
 
-  addItem(personagemId: number, item: Item) {
+  updateNomeAventureiro(id: number, nomeAventureiro: string): Personagem {
+    const personagem = this.personagens.find((char) => char.id === id);
+    if (!personagem) throw new NotFoundException('Personagem não encontrado.');
+
+    personagem.nomeAventureiro = nomeAventureiro;
+    return personagem;
+  }
+
+  remove(id: number) {
+    const index = this.personagens.findIndex((char) => char.id === id);
+    if (index === -1) throw new NotFoundException('Personagem não encontrado.');
+
+    this.personagens.splice(index, 1);
+    return { message: 'Personagem removido com sucesso.' };
+  }
+
+  addItem(personagemId: number, item: ItemMagico) {
     const personagem = this.personagens.find((char) => char.id === personagemId);
     if (!personagem) throw new NotFoundException('Personagem não encontrado.');
 
     if (item.tipo === 'Amuleto') {
-      const terAmuleto = personagem.items.some((i) => i.tipo === 'Amuleto');
-      if (terAmuleto) {
-        throw new BadRequestException('Cada personagem só pode ter um Amuleto.');
+      const jaTemAmuleto = personagem.items.some((i) => i.tipo === 'Amuleto');
+      if (jaTemAmuleto) {
+        throw new BadRequestException('Personagem só pode ter um amuleto.');
       }
     }
 
     personagem.items.push(item);
     return item;
+  }
+
+  listarItens(personagemId: number) {
+    const personagem = this.personagens.find((char) => char.id === personagemId);
+    if (!personagem) throw new NotFoundException('Personagem não encontrado.');
+
+    return personagem.items;
+  }
+
+  buscarAmuleto(personagemId: number) {
+    const personagem = this.personagens.find((char) => char.id === personagemId);
+    if (!personagem) throw new NotFoundException('Personagem não encontrado.');
+
+    const amuleto = personagem.items.find((item) => item.tipo === 'Amuleto');
+    if (!amuleto) throw new NotFoundException('Personagem não possui amuleto.');
+
+    return amuleto;
+  }
+
+  removerItem(personagemId: number, nomeItem: string) {
+    const personagem = this.personagens.find((char) => char.id === personagemId);
+    if (!personagem) throw new NotFoundException('Personagem não encontrado.');
+
+    const index = personagem.items.findIndex((item) => item.nome === nomeItem);
+    if (index === -1) throw new NotFoundException('Item não encontrado.');
+
+    personagem.items.splice(index, 1);
+    return { message: 'Item removido com sucesso.' };
   }
 }

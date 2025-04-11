@@ -1,10 +1,5 @@
 import { PersonagemClasse } from '../../common/enums/classe.enum';
-
-export interface Item {
-  tipo: string;
-  forca: number;
-  defesa: number;
-}
+import { ItemMagico } from '../../item-magico/interfaces/item-magico.interfaces';
 
 export interface Personagem {
   id: number;
@@ -14,5 +9,5 @@ export interface Personagem {
   level: number;
   forca: number;
   defesa: number;
-  items: Item[];
+  items: ItemMagico[];
 }
